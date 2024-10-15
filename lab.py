@@ -6,6 +6,8 @@ class Vanila:
     """
     def __init__(self):
         self.layers = []
+        self.weights = []
+        self.biases = [] 
         self.init_method = None
 
 
@@ -14,6 +16,16 @@ class Vanila:
             raise TypeError("The number of neurons must be an integer.")
         if number_of_neurons < 1:
             raise ValueError("The number of neurons must be at least 1.")
+        if self.init_method == None:
+            raise ValueError("In order to add a layer you have to set the initializtion method")
+
+        if self.layers:
+            if self.init_method == "xavier":
+                previous_neurons = self.layers[-1]
+                # weights = np.random.uniform  Continue from here!
+            
+
+
         self.layers.append(number_of_neurons)
 
     def properties(self):
