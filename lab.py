@@ -65,6 +65,7 @@ class Activations:
         return np.maximum(0, x)  
 
 class Loss:
+
     def MSE(self,y_pred, y_true):
         """
         Calculate the Mean Squared Error (MSE) between true values and predictions.
@@ -104,11 +105,23 @@ class Loss:
         return mse
 
 
-    def HuberLoss(self,y_pred, y_true, delta):
-        pass
+    def huber_loss(y_pred, y_true, delta):
+        abs_loss = np.abs(y_pred - y_true)
+        loss = np.where(abs_loss < delta,
+                        0.5 * (y_pred - y_true) ** 2,  # Squared error if within delta
+                        delta * (abs_loss - 0.5 * delta))  # Linear error if beyond delta
+        return np.mean(loss) 
 
-    def BCE(self):
-        pass
+    def BCE(self, y_pred, y_true):
+        return -(y_true * np.log(y_pred) + (1-y_true)* np.log(1-y_pred))
 
     def CCE(self):
         pass
+
+
+class train:
+
+    def forward(self, input):
+        pass
+
+    
