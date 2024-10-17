@@ -124,7 +124,6 @@ class Loss:
 
 
 class train:
-
     def forward(self, input):
         pass
 
