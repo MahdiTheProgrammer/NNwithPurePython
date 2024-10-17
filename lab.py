@@ -50,13 +50,14 @@ class Vanila:
     def print_weights(self):
         for i, weight in enumerate(self.weights):
             print(f"Weights for layer {i+1}:\n{weight}\n")
+            print(len(weight))
 
     def forward(self, input):
         if self.activation == None:
             raise ValueError("No activation function is set.")
         output = input
         for f1 in range(len(self.layers)-1):
-            output = self.activation(np.dot(output, self.weights[f1])+self.biases[f1].T)
+            output = self.activation(np.dot(output, self.weights[f1]) + self.biases[f1+1].T)
 
         return output
 
