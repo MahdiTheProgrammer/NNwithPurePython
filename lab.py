@@ -108,15 +108,19 @@ class Loss:
     def huber_loss(y_pred, y_true, delta):
         abs_loss = np.abs(y_pred - y_true)
         loss = np.where(abs_loss < delta,
-                        0.5 * (y_pred - y_true) ** 2,  # Squared error if within delta
-                        delta * (abs_loss - 0.5 * delta))  # Linear error if beyond delta
+                        0.5 * (y_pred - y_true) ** 2,  
+                        delta * (abs_loss - 0.5 * delta))  
         return np.mean(loss) 
 
     def BCE(self, y_pred, y_true):
-        return -(y_true * np.log(y_pred) + (1-y_true)* np.log(1-y_pred))
+        epsilon = 1e-10
+        y_pred = np.clip(y_pred, epsilon, 1-epsilon)
+        return -np.mean(y_true * np.log(y_pred) + (1-y_true)* np.log(1-y_pred))
 
-    def CCE(self):
-        pass
+    def CCE(self, y_pred, y_true):
+        epsilon = 1e-10
+        y_pred = np.clip(y_pred, epsilon, 1-epsilon)
+        return -np.mean(np.sum(y_true*np.log(y_pred), axis=1))
 
 
 class train:
