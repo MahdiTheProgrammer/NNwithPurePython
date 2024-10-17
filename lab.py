@@ -10,7 +10,7 @@ class Vanila:
         self.weights = []
         self.biases = [] 
         self.init_method = None
-
+        self.activation = None
 
     def add_vanila(self, number_of_neurons):
         if not isinstance(number_of_neurons, int):
@@ -45,12 +45,32 @@ class Vanila:
         if init_method == "xavier" or init_method == "he":
             self.init_method = init_method
         else:
-            raise ValueError("For vanila model only xavier and he is available at this moment")
-        
+            raise ValueError("For vanila model only xavier and he is available at this moment")        
 
     def print_weights(self):
         for i, weight in enumerate(self.weights):
             print(f"Weights for layer {i+1}:\n{weight}\n")
+
+    def forward(self, input):
+        if self.activation == None:
+            raise ValueError("No activation function is set.")
+        output = input
+        for f1 in range(len(self.layers)-1):
+            output = self.activation(np.dot(output, self.weights[f1])+self.biases[f1].T)
+
+        return output
+
+    def set_activation(self, activation):
+        activations = Activations()
+        if activation == 'sigmoid':
+            self.activation = activations.sigmoid
+        elif activation == 'tanh':
+            self.activation = activations.tanh
+        elif activation == 'relu':
+            self.activation = activations.ReLU
+        else:
+            raise ValueError("Supported activations: 'sigmoid', 'tanh', 'relu'.")
+        
 
 class Activations:
     def sigmoid(self, x):
@@ -63,9 +83,9 @@ class Activations:
 
     def ReLU(self, x):
         return np.maximum(0, x)  
+    
 
 class Loss:
-
     def MSE(self,y_pred, y_true):
         """
         Calculate the Mean Squared Error (MSE) between true values and predictions.
@@ -101,11 +121,10 @@ class Loss:
         y_pred = np.array(y_pred)
         
         # Calculate squared differences, mean them
-        mse = np.mean((y_true - y_pred))
+        mse = np.mean(np.abs(y_true - y_pred))
         return mse
 
-
-    def huber_loss(y_pred, y_true, delta):
+    def huber_loss(self,y_pred, y_true, delta):
         abs_loss = np.abs(y_pred - y_true)
         loss = np.where(abs_loss < delta,
                         0.5 * (y_pred - y_true) ** 2,  
@@ -122,9 +141,5 @@ class Loss:
         y_pred = np.clip(y_pred, epsilon, 1-epsilon)
         return -np.mean(np.sum(y_true*np.log(y_pred), axis=1))
 
-
-class train:
-    def forward(self, input):
-        pass
 
     
