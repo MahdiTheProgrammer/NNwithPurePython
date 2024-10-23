@@ -11,6 +11,8 @@ class Vanila:
         self.biases = [] 
         self.init_method = None
         self.activation = None
+        self.a_values = []
+        self.z_values = []
 
     def add_vanila(self, number_of_neurons):
         if not isinstance(number_of_neurons, int):
@@ -58,10 +60,10 @@ class Vanila:
 
         if self.activation == None:
             raise ValueError("No activation function is set.")
-        self.z_values = input
+        # self.z_values = input
         for f1 in range(len(self.layers)-1):
             # output = self.activation(np.dot(output, self.weights[f1]) + self.biases[f1+1].T)
-            self.z_values.append(np.dot(self.z_values[-1], self.weights[f1]) + self.biases[f1+1].T)
+            self.z_values.append(np.dot(input if f1 == 0 else self.z_values[-1], self.weights[f1]) + self.biases[f1+1].T)
             self.a_values.append(self.activation(self.z_values[-1]))
             
 
@@ -154,6 +156,8 @@ class train:
     def get_loss(y, y_pred, loss_method, ):
         return loss_method(y_pred = y_pred, y_true = y)
         
-    def backpropagation(self, model, y, y_pred):
-        y = model()
-        
+    def backpropagation(self, model , y, y_pred):
+        pass
+        # Consider the function is different for different activation functions
+        # gradients = np.dot((model.a_values - y),model.a_values)
+        # return gradients 
