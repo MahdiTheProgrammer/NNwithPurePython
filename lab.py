@@ -50,16 +50,23 @@ class Vanila:
     def print_weights(self):
         for i, weight in enumerate(self.weights):
             print(f"Weights for layer {i+1}:\n{weight}\n")
-            print(len(weight))
 
     def forward(self, input):
+        self.a_values = []
+        self.z_values = []
+
+
         if self.activation == None:
             raise ValueError("No activation function is set.")
-        output = input
+        self.z_values = input
         for f1 in range(len(self.layers)-1):
-            output = self.activation(np.dot(output, self.weights[f1]) + self.biases[f1+1].T)
+            # output = self.activation(np.dot(output, self.weights[f1]) + self.biases[f1+1].T)
+            self.z_values.append(np.dot(self.z_values[-1], self.weights[f1]) + self.biases[f1+1].T)
+            self.a_values.append(self.activation(self.z_values[-1]))
+            
 
-        return output
+        # return output
+        return self.a_values[-1]
 
     def set_activation(self, activation):
         activations = Activations()
@@ -87,7 +94,7 @@ class Activations:
     
 
 class Loss:
-    def MSE(self,y_pred, y_true):
+    def MSE(y_pred, y_true):
         """
         Calculate the Mean Squared Error (MSE) between true values and predictions.
 
@@ -106,7 +113,7 @@ class Loss:
         mse = np.mean((y_true - y_pred) ** 2)
         return mse
     
-    def MAE(self,y_pred, y_true):
+    def MAE(y_pred, y_true):
         """
         Calculate the Mean Absolute Error (MAE) between true values and predictions.
 
@@ -125,22 +132,28 @@ class Loss:
         mse = np.mean(np.abs(y_true - y_pred))
         return mse
 
-    def huber_loss(self,y_pred, y_true, delta):
+    def huber_loss(y_pred, y_true, delta):
         abs_loss = np.abs(y_pred - y_true)
         loss = np.where(abs_loss < delta,
                         0.5 * (y_pred - y_true) ** 2,  
                         delta * (abs_loss - 0.5 * delta))  
         return np.mean(loss) 
 
-    def BCE(self, y_pred, y_true):
+    def BCE( y_pred, y_true):
         epsilon = 1e-10
         y_pred = np.clip(y_pred, epsilon, 1-epsilon)
         return -np.mean(y_true * np.log(y_pred) + (1-y_true)* np.log(1-y_pred))
 
-    def CCE(self, y_pred, y_true):
+    def CCE(y_pred, y_true):
         epsilon = 1e-10
         y_pred = np.clip(y_pred, epsilon, 1-epsilon)
         return -np.mean(np.sum(y_true*np.log(y_pred), axis=1))
 
 
-    
+class train:
+    def get_loss(y, y_pred, loss_method, ):
+        return loss_method(y_pred = y_pred, y_true = y)
+        
+    def backpropagation(self, model, y, y_pred):
+        y = model()
+        
