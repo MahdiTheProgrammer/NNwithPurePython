@@ -14,6 +14,7 @@ class Vanila:
         self.a_values = []
         self.z_values = []
 
+
     def add_vanila(self, number_of_neurons):
         if not isinstance(number_of_neurons, int):
             raise TypeError("The number of neurons must be an integer.")
@@ -156,8 +157,12 @@ class train:
     def get_loss(y, y_pred, loss_method, ):
         return loss_method(y_pred = y_pred, y_true = y)
         
-    def backpropagation(self, model , y, y_pred):
-        pass
-        # Consider the function is different for different activation functions
-        # gradients = np.dot((model.a_values - y),model.a_values)
-        # return gradients 
+    def backpropagation( model , y, y_pred, X):
+        model_len = len(model.layers)
+        for f1 in range(len(model.layers)):
+            if f1 == 0: 
+                res = -y_pred / model.a_values[model_len-f1]
+                res = res * math.e**
+            grad_w = 'a'
+            grad_b = 'b'
+        return grad_w, grad_b
