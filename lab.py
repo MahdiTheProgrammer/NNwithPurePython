@@ -158,11 +158,24 @@ class train:
         return loss_method(y_pred = y_pred, y_true = y)
         
     def backpropagation( model , y, y_pred, X):
-        model_len = len(model.layers)
-        for f1 in range(len(model.layers)):
+        # assuming we are using categorical cce and sigmoid
+        delta = []
+        model_len = len(model.layers)-2
+        for f1 in range(len(model.layers)-1):
+            print(f"f1 is: {f1}")
+            # if f1 == 0: 
+            #     res = np.array(-y_pred) / np.array(model.a_values[model_len-f1])
+            #     res = np.dot(np.array(res) *((math.e**(-model.z_values[model_len-f1]))/((1+math.e**[model_len-f1])**2)))
+            #     res = np.dot(np.array(res) ,np.array(model.weights[model_len-f1]))
             if f1 == 0: 
-                res = -y_pred / model.a_values[model_len-f1]
-                res = res * math.e**
-            grad_w = 'a'
-            grad_b = 'b'
-        return grad_w, grad_b
+                deltan = np.dot((-(np.array(y_pred) / np.array(model.a_values[model_len-f1]))).T,
+                               (math.e**(-model.z_values[model_len-f1])/((1+math.e**(-model.z_values[model_len-f1])))**2))
+            else:
+                deltan = np.dot(delta[-1], np.array(model.weights[model_len-f1+1]).T)
+                deltan = np.dot(deltan, (math.e**(-model.z_values[(model_len-f1)])/((1+math.e**(-model.z_values[(model_len-f1)])))**2).T)
+            print(f"last delta shape is: {deltan.shape}")
+            delta.append(deltan)
+        #     grad_w = 'a'
+        #     grad_b = 'b'
+        # return grad_w, grad_b
+        return delta
