@@ -29,7 +29,7 @@ class Vanila:
                 weights = np.random.uniform(-(np.sqrt(6/(previous_neurons+number_of_neurons))),
                                              np.sqrt(6/(previous_neurons+number_of_neurons)), (previous_neurons, number_of_neurons))
             else:
-                weights = np.random.randn(previous_neurons, number_of_neurons) * np.sqrt(2 / previous_neurons) #IDK why
+                weights = np.random.randn(previous_neurons, number_of_neurons) * np.sqrt(2 / previous_neurons) 
 
             self.weights.append(weights)
         
@@ -65,7 +65,10 @@ class Vanila:
         for f1 in range(len(self.layers)-1):
             # output = self.activation(np.dot(output, self.weights[f1]) + self.biases[f1+1].T)
             self.z_values.append(np.dot(input if f1 == 0 else self.z_values[-1], self.weights[f1]) + self.biases[f1+1].T)
-            self.a_values.append(self.activation(self.z_values[-1]))
+            if f1 != len(self.layers)-2:
+                self.a_values.append(self.activation(self.z_values[-1]))
+            else:
+                self.a_values.append(Activations.softmax(self.z_values[-1]))   #This is because no matter what i use in hidden layers i want to use softmax for last layer.
             
 
         # return output
@@ -80,7 +83,7 @@ class Vanila:
         elif activation == 'relu':
             self.activation = activations.ReLU
         else:
-            raise ValueError("Supported activations: 'sigmoid', 'tanh', 'relu'.")
+            raise ValueError("Supported activations: 'sigmoid', 'tanh', 'relu', 'softmax'.")
         
 
 class Activations:
@@ -94,6 +97,12 @@ class Activations:
 
     def ReLU(self, x):
         return np.maximum(0, x)  
+    
+    @staticmethod
+    def softmax(x):
+        x_shifted = x - np.max(x, axis=1, keepdims=True)  # Fix stability issue for batches
+        exp_values = np.exp(x_shifted)
+        return exp_values / np.sum(exp_values, axis=1, keepdims=True)
     
 
 class Loss:
@@ -157,24 +166,24 @@ class train:
     def get_loss(y, y_pred, loss_method, ):
         return loss_method(y_pred = y_pred, y_true = y)
         
-    def backpropagation( model , y, y_pred, X):
+    def backpropagation(model , y, y_pred, X, loss_function, activation_function):
         # assuming we are using categorical cce and sigmoid
         delta = []
-        model_len = len(model.layers)-2
-        for f1 in range(len(model.layers)-1):
-            print(f"f1 is: {f1}")
+        # model_len = len(model.layers)-2
+        # for f1 in range(len(model.layers)-1):
+        #     print(f"f1 is: {f1}")
             # if f1 == 0: 
             #     res = np.array(-y_pred) / np.array(model.a_values[model_len-f1])
             #     res = np.dot(np.array(res) *((math.e**(-model.z_values[model_len-f1]))/((1+math.e**[model_len-f1])**2)))
             #     res = np.dot(np.array(res) ,np.array(model.weights[model_len-f1]))
-            if f1 == 0: 
-                deltan = np.dot((-(np.array(y_pred) / np.array(model.a_values[model_len-f1]))).T,
-                               (math.e**(-model.z_values[model_len-f1])/((1+math.e**(-model.z_values[model_len-f1])))**2))
-            else:
-                deltan = np.dot(delta[-1], np.array(model.weights[model_len-f1+1]).T)
-                deltan = np.dot(deltan, (math.e**(-model.z_values[(model_len-f1)])/((1+math.e**(-model.z_values[(model_len-f1)])))**2).T)
-            print(f"last delta shape is: {deltan.shape}")
-            delta.append(deltan)
+            # if f1 == 0: 
+            #     deltan = np.dot((-(np.array(y_pred) / np.array(model.a_values[model_len-f1]))).T,
+            #                    (math.e**(-model.z_values[model_len-f1])/((1+math.e**(-model.z_values[model_len-f1])))**2))
+            # else:
+            #     deltan = np.dot(delta[-1], np.array(model.weights[model_len-f1+1]).T)
+            #     deltan = np.dot(deltan, (math.e**(-model.z_values[(model_len-f1)])/((1+math.e**(-model.z_values[(model_len-f1)])))**2).T)
+            # print(f"last delta shape is: {deltan.shape}")
+            # delta.append(deltan)
         #     grad_w = 'a'
         #     grad_b = 'b'
         # return grad_w, grad_b
