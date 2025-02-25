@@ -181,6 +181,11 @@ class train:
             else:
                 delta.append(np.dot(model.weights[-f1], delta[-1].T).T* np.squeeze(Activations.relu_derivative(z_values[-f1-1])))
 
+        dW = []  # Store gradients for weights
+        db = []  # Store gradients for biases
 
-
-        return delta
+        for f2 in range(len(model.weights)):
+            dW.append(np.dot(a_values[f2].T, delta[f2]))  # Compute weight gradient
+            db.append(np.sum(delta[f2], axis=0, keepdims=True)) 
+            
+        return delta, dW
