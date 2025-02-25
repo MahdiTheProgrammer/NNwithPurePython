@@ -96,13 +96,16 @@ class Activations:
         return y
 
     def ReLU(self, x):
-        return np.maximum(0, x)  
-    
+        return np.maximum(0, x)    
     @staticmethod
     def softmax(x):
         x_shifted = x - np.max(x, axis=1, keepdims=True)  # Fix stability issue for batches
         exp_values = np.exp(x_shifted)
         return exp_values / np.sum(exp_values, axis=1, keepdims=True)
+    @staticmethod
+    def relu_derivative(z):
+        return np.where(z > 0, 1, 0)
+
     
 
 class Loss:
@@ -157,7 +160,7 @@ class Loss:
         return -np.mean(y_true * np.log(y_pred) + (1-y_true)* np.log(1-y_pred))
 
     def CCE(y_pred, y_true):
-        epsilon = 1e-10
+        epsilon = 1e-8
         y_pred = np.clip(y_pred, epsilon, 1-epsilon)
         return -np.mean(np.sum(y_true*np.log(y_pred), axis=1))
 
@@ -166,25 +169,18 @@ class train:
     def get_loss(y, y_pred, loss_method, ):
         return loss_method(y_pred = y_pred, y_true = y)
         
-    def backpropagation(model , y, y_pred, X, loss_function, activation_function):
-        # assuming we are using categorical cce and sigmoid
+    def backpropagation(model , y, y_pred,):
+    # def backpropagation(model):
+        # assuming we are using categorical cce, relu for hidden layers and softmax for last layer. This is the first version so...
         delta = []
-        # model_len = len(model.layers)-2
-        # for f1 in range(len(model.layers)-1):
-        #     print(f"f1 is: {f1}")
-            # if f1 == 0: 
-            #     res = np.array(-y_pred) / np.array(model.a_values[model_len-f1])
-            #     res = np.dot(np.array(res) *((math.e**(-model.z_values[model_len-f1]))/((1+math.e**[model_len-f1])**2)))
-            #     res = np.dot(np.array(res) ,np.array(model.weights[model_len-f1]))
-            # if f1 == 0: 
-            #     deltan = np.dot((-(np.array(y_pred) / np.array(model.a_values[model_len-f1]))).T,
-            #                    (math.e**(-model.z_values[model_len-f1])/((1+math.e**(-model.z_values[model_len-f1])))**2))
-            # else:
-            #     deltan = np.dot(delta[-1], np.array(model.weights[model_len-f1+1]).T)
-            #     deltan = np.dot(deltan, (math.e**(-model.z_values[(model_len-f1)])/((1+math.e**(-model.z_values[(model_len-f1)])))**2).T)
-            # print(f"last delta shape is: {deltan.shape}")
-            # delta.append(deltan)
-        #     grad_w = 'a'
-        #     grad_b = 'b'
-        # return grad_w, grad_b
+        a_values = model.a_values
+        z_values = model.z_values
+        for f1 in range(len(model.layers)-1):
+            if f1 == 0: 
+                delta.append(a_values[-1]-y)            
+            else:
+                delta.append(np.dot(model.weights[-f1], delta[-1].T)* Activations.relu_derivative(z_values[-f1-1]))
+
+
+
         return delta
