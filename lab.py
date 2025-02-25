@@ -179,7 +179,7 @@ class train:
             if f1 == 0: 
                 delta.append(a_values[-1]-y)            
             else:
-                delta.append(np.dot(model.weights[-f1], delta[-1].T)* Activations.relu_derivative(z_values[-f1-1]))
+                delta.append(np.dot(model.weights[-f1], delta[-1].T).T* np.squeeze(Activations.relu_derivative(z_values[-f1-1])))
 
 
 
