@@ -17,12 +17,16 @@ model.print_weights()
 
 model.set_activation(activation='relu')
 
-x= model.forward(np.linspace(0,1,10))
+input = np.linspace(0,1,10)
 
-# print(x)
+x= model.forward(input)
 
-# print(np.sum(x))
+print(x)
 
-x,dw = train.backpropagation(model = model, y_pred=x, y=[1,0,0],)
+print(np.sum(x))
+
+
+delta ,dw, db = train.backpropagation (model = model, y_pred=x, y=[1,0,0],X=np.expand_dims(input,axis=0))
 # print(x)
 print(dw)
+print(db)

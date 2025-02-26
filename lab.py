@@ -169,7 +169,7 @@ class train:
     def get_loss(y, y_pred, loss_method, ):
         return loss_method(y_pred = y_pred, y_true = y)
         
-    def backpropagation(model , y, y_pred,):
+    def backpropagation(model , y, y_pred,X):
     # def backpropagation(model):
         # assuming we are using categorical cce, relu for hidden layers and softmax for last layer. This is the first version so...
         delta = []
@@ -183,9 +183,9 @@ class train:
 
         dW = []  # Store gradients for weights
         db = []  # Store gradients for biases
-
+        a_values.insert(0, X)
         for f2 in range(len(model.weights)):
-            dW.append(np.dot(a_values[f2].T, delta[f2]))  # Compute weight gradient
-            db.append(np.sum(delta[f2], axis=0, keepdims=True)) 
+            dW.append(np.dot(a_values[f2].T, delta[-f2-1]))  # Compute weight gradient
+            db.append(np.sum(delta[-f2-1], axis=0, keepdims=True)) 
             
-        return delta, dW
+        return delta, dW, db
