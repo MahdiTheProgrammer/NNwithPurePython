@@ -26,7 +26,7 @@ print(x)
 print(np.sum(x))
 
 
-delta ,dw, db = train.backpropagation (model = model, y_pred=x, y=[1,0,0],X=np.expand_dims(input,axis=0))
+delta ,dw, db = train.backpropagation (model = model, y_pred=x, y=[1,0,0],X=np.expand_dims(input,axis=0), lr=0.01)
 # print(x)
 print(dw)
 print(db)

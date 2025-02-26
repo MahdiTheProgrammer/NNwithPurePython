@@ -32,8 +32,8 @@ class Vanila:
                 weights = np.random.randn(previous_neurons, number_of_neurons) * np.sqrt(2 / previous_neurons) 
 
             self.weights.append(weights)
-        
-        self.biases.append(np.zeros((number_of_neurons, 1)))
+            self.biases.append(np.zeros((number_of_neurons, 1)))
+
         self.layers.append(number_of_neurons)
 
     def properties(self):
@@ -64,7 +64,7 @@ class Vanila:
         # self.z_values = input
         for f1 in range(len(self.layers)-1):
             # output = self.activation(np.dot(output, self.weights[f1]) + self.biases[f1+1].T)
-            self.z_values.append(np.dot(input if f1 == 0 else self.z_values[-1], self.weights[f1]) + self.biases[f1+1].T)
+            self.z_values.append(np.dot(input if f1 == 0 else self.z_values[-1], self.weights[f1]) + self.biases[f1].T)
             if f1 != len(self.layers)-2:
                 self.a_values.append(self.activation(self.z_values[-1]))
             else:
@@ -97,11 +97,29 @@ class Activations:
 
     def ReLU(self, x):
         return np.maximum(0, x)    
+    
+    # @staticmethod
+    # def softmax(x):
+    #     x_shifted = x - np.max(x, axis=1, keepdims=True)  # Fix stability issue for batches
+    #     exp_values = np.exp(x_shifted)
+    #     return exp_values / np.sum(exp_values, axis=1, keepdims=True)
+    
     @staticmethod
     def softmax(x):
-        x_shifted = x - np.max(x, axis=1, keepdims=True)  # Fix stability issue for batches
+        # Convert to 2D if needed
+        x = np.atleast_2d(x)
+
+        # Handle NaN or Inf before applying softmax
+        if np.isnan(x).any() or np.isinf(x).any():
+            print("Warning: Softmax received invalid values.")
+            x = np.nan_to_num(x)  # Replace NaNs with 0
+
+        # Apply numerical stability trick
+        x_shifted = x - np.max(x, axis=1, keepdims=True)  # Prevent overflow
         exp_values = np.exp(x_shifted)
+        
         return exp_values / np.sum(exp_values, axis=1, keepdims=True)
+
     @staticmethod
     def relu_derivative(z):
         return np.where(z > 0, 1, 0)
@@ -169,7 +187,7 @@ class train:
     def get_loss(y, y_pred, loss_method, ):
         return loss_method(y_pred = y_pred, y_true = y)
         
-    def backpropagation(model , y, y_pred,X):
+    def backpropagation(model , y, y_pred,X,lr):
     # def backpropagation(model):
         # assuming we are using categorical cce, relu for hidden layers and softmax for last layer. This is the first version so...
         delta = []
@@ -187,5 +205,10 @@ class train:
         for f2 in range(len(model.weights)):
             dW.append(np.dot(a_values[f2].T, delta[-f2-1]))  # Compute weight gradient
             db.append(np.sum(delta[-f2-1], axis=0, keepdims=True)) 
-            
+
+        for l in range(len(model.weights)):  
+            model.weights[l] -= lr * dW[l]  
+            # print(np.shape(model.biases))
+            model.biases[l] = (model.biases[l].T - (lr * db[l])).T
+            # print(np.shape(model.biases))
         return delta, dW, db
